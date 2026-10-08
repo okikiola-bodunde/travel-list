@@ -7,11 +7,21 @@ const initialItems = [
 ];
 
 export default function App() {
+  const [items, setItems] = useState(initialItems);
+
+  function handleAddItems(newItem) {
+    setItems((items) => [...items, newItem]);
+  }
+
+  function handleDeleteitem(id) {
+    setItems((items) => items.filter((item) => item.id !== id));
+  }
+
   return (
     <div className="app">
       <Logo />
-      <Form />
-      <ParkingList />
+      <Form onAddItems={handleAddItems} />
+      <ParkingList items={items} onDeleteItem={handleDeleteitem} />
       <Stats />
     </div>
   );
@@ -21,7 +31,7 @@ function Logo() {
   return <h1> Far Away </h1>;
 }
 
-function Form() {
+function Form({ onAddItems }) {
   const [description, setDescription] = useState("");
   const [quantity, setQuantity] = useState(1);
 
@@ -31,6 +41,8 @@ function Form() {
     if (!description) return;
 
     const newItem = { description, quantity, packed: false, id: Date.now() };
+
+    onAddItems(newItem);
 
     setDescription("");
     setQuantity(1);
@@ -61,21 +73,21 @@ function Form() {
   );
 }
 
-function ParkingList() {
+function ParkingList({ items, onDeleteItem }) {
   return (
     <div className="list">
       {/* <h3>Parking Options</h3> */}
 
       <ul>
-        {initialItems.map((item) => (
-          <Item item={item} key={item.id} />
+        {items.map((item) => (
+          <Item item={item} onDeleteItem={onDeleteItem} key={item.id} />
         ))}
       </ul>
     </div>
   );
 }
 
-function Item({ item }) {
+function Item({ item, onDeleteItem }) {
   return (
     <li>
       {" "}
@@ -83,6 +95,7 @@ function Item({ item }) {
         {item.quantity} {item.description}
       </span>
       <button
+        onClick={() => onDeleteItem(item.id)}
         style={{ backgroundColor: "red", color: "white", borderRadius: "100%" }}
       >
         X
